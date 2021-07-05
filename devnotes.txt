@@ -1,0 +1,95 @@
+Prerequisites:
+- Install docker
+- Register at dockerhub
+
+1.
+docker
+docker version
+
+2.
+docker pull <image>:<tag=latest>
+
+3.
+docker run -it -p 80:80 <image> (will pull if local version is not available)
+	-it: executes the container in interactive mode (not in the background, showing on terminal)
+	http://localhost:8080
+	
+4. 
+docker ps
+docker rm <container-id>
+	cannot remove since it's running
+	ctrl + c
+	docker ps -a (since it's been removed)
+	docker rm <container-id>
+docker run can take --rm to delete container once it exits
+	
+5.
+docker images
+docker images | grep <image> 
+docker image rm <image-id> || docker rmi <image-id>
+
+6. 
+docker run -d -p 8080:80 <image> (detached mode)
+docker stop <container-id>
+
+7. 
+docker run -d -p 8080:80 --name <my-container> <image>
+	then use all command above with name
+	docker stop <my-container>
+
+8.
+docker start <my-container>
+
+9.
+docker exec -it <my-container> bash
+	cd usr/share/nginx/html/
+	cat index.html
+	
+10.
+docker run -d -p 8080:80 --name mynginx -v ~/tutorials/docker-tutorial/helloworld/html:/usr/share/nginx/html nginx
+docker logs mynginx
+docker run -d -p 8080:80 --name mynginx -v ~/tutorials/docker-tutorial/helloworld/html:/usr/share/nginx/html -v ~/tutorials/docker-tutorial/helloworld/logs:/var/log/nginx nginx
+
+11.
+create Dockerfile
+docker build -t mynginx_image1 .
+	see at each step there is a hash with the image (nginx and mynginx_image1)
+docker run -d -p 8080:80 --name mynginx mynginx_image1
+
+12.
+docker login
+	or
+		rm ~/.docker/config.json
+		docker login
+docker tag mynginx_image1 lpredrum136/mynginx_image:28-06-21
+docker push lpredrum136/mynginx_image:28-06-21
+now you can:
+	docker rmi mynginx_image1 lpredrum136/mynginx_image
+	
+	--------------------------------
+	
+	PYTHON FLASK APP
+	only needs Dockerfile, main.py and requirements.txt
+	
+	------------------------------------
+	
+	NODE
+	
+	docker run -d -p 4000:4000 --name my-node-app my-node-image
+    docker run -e env-var=something to override env-var (declared in Dockerfile) with something
+	docker-compose up -d (build, run, and give it a name)
+    docker-compose down
+	
+	
+13. EXTRA
+FROM image:tag
+RUN
+
+FROM python:alpine3.7
+COPY . /
+WORKDIR /
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD python ./main.py
+
+docker cp ./devnotes.txt mynginx:/devnotes.txt
